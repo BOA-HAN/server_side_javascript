@@ -1,9 +1,32 @@
 var express = require('express');
 var app = express();
+var bodyParser = require('body-parser');
 app.locals.pretty = true; // make pretty code
-app.set('view engine', 'jade'); // template engine setting with jade
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+// parse application/json
+app.use(bodyParser.json())
+app.set('view engine', 'pug'); // template engine setting with jade
 app.set('views', './views');
 app.use(express.static('public'))
+app.get('/form', function(req, res){
+  res.render('form');
+});
+app.get('/form_receiver', function(req, res){
+  var title = req.query.title;
+  var description = req.query.description;
+  res.send(title+', '+description);
+});
+app.use('/form_receiver', function(req, res){
+  res.setHeader('Content-Type', 'text/plain')
+  res.write('you posted:\n')
+  res.end(JSON.stringify(req.body.description, null, 2))
+  //res.send('Hello Post');
+  //
+   //var title = req.body.title;
+   //var description = req.body.description;
+  // res.send(title+', '+description);
+});
 app.get('/topic/:id', function(req, res){
   var topics = [
     'Javascript is...',
